@@ -7,7 +7,6 @@ import traceback
 import discord
 import motor.motor_asyncio
 import redis
-import RESTInterface
 from aiohttp import ClientResponseError, ClientOSError
 from discord.errors import Forbidden, HTTPException, InvalidArgument, NotFound
 from discord.ext import commands
@@ -220,6 +219,8 @@ async def on_message(message):
         msglog.debug("PM with {0.author} ({0.author.id}): {0.content}".format(message))
     if str(message.author.id) in bot.get_cog("AdminUtils").muted:
         return
+    #hook for REST API Listener
+
     await bot.process_commands(message)
 
 

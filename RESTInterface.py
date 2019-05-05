@@ -9,8 +9,12 @@ import time
 
 _TIMEOUTSEC=120  #timeout of key from issue in seconds
 
+
 _connectionKeys={}
 _connectionKeyTimeout={}
+_websockets={}
+
+DiscordClient=None
 
 random.seed()
 
@@ -35,16 +39,23 @@ def GetUserIDByKey(key):
     return _connectionKeys[key]
 
 
-async def hello(websocket, path):
-    name = await websocket.recv()
-    print(f"< {name}")
+async def connect(websocket, path):
+    key = int(await websocket.recv())
+    if not IsKeyValid(key):
+        await websocket.send('INVALID KEY')
+        websocket.close()
+        return
+    userid= GetUserIDByKey(key)
+    _websockets[userid]=websocket
+    await websocket.send('CONNECTED')
+    while websocket.open:
+        message=await websocket.recv()
 
-    greeting = f"Hello {name}!"
+
+
 
     await websocket.send(greeting)
     print(f"> {greeting}")
 
-start_server = websockets.serve(hello, 'localhost', 8765)
 
-asyncio.get_event_loop().run_until_complete(start_server)
 #asyncio.get_event_loop().run_forever()
